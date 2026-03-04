@@ -4,6 +4,10 @@
     {
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
 
+        List<List<float>> matrice;
+        int nbRows;
+        int nbColumns;
+        float defaultValue;
 
         /* Crée une matrice de dimensions `nbRows` x `nbColums`.
          * Toutes les cases de cette matrice sont remplies avec `defaultValue`.
@@ -12,30 +16,40 @@
         public Matrix(int nbRows = 0, int nbColumns = 0, float defaultValue = 0)
         {
             // TODO : implémenter
-        }
 
-        // Propriété : valeur par défaut utilisée pour remplir les nouvelles cases
-        // Lecture seule
+            if(nbRows < 0|| nbColumns<0)
+            {
+                throw new ArgumentOutOfRangeException("Erreur : nb de colonnes ou de lignes négatif");
+            }
+            this.nbRows = nbRows;
+            this.nbColumns = nbColumns;
+            this.defaultValue = defaultValue;
+            this.matrice = new List<List<float>>();
+
+            for (int i = 0; i < nbRows; i++)
+            {
+                List<float> colonne = new List<float>();
+                {
+                    for (int j = 0; j < nbColumns; j++)
+                    {
+                        colonne.Add(defaultValue);
+                    }
+                    matrice.Add(colonne);
+                }
+            }
+        }
+        
         public float DefaultValue
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get { return this.defaultValue; } // TODO pas de set
         }
-
-        // Propriété : nombre de lignes
-        // Lecture seule
         public int NbRows
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get { return this.nbRows; }  //TODO pas de set
         }
-
-        // Propriété : nombre de colonnes
-        // Lecture seule
         public int NbColumns
         {
-            get; // TODO : implémenter
-                 // pas de set
+            get { return this.nbColumns; } // TODO pas de set
         }
 
         /* Insère une ligne à l'indice `i`. Décale les lignes suivantes vers le bas.
@@ -45,6 +59,18 @@
          */
         public void AddRow(int i)
         {
+            if( (i<0) || (i > nbRows) )
+            {
+                throw new ArgumentOutOfRangeException("l'indice n'est pas dans les bornes");
+            }
+            List<float> newRow = new List<float>();
+            for (int j = 0; j < nbColumns; j++)
+            {
+                newRow.Add(defaultValue);
+            }
+            this.nbRows++;
+            this.matrice.Insert(i, newRow);
+            
             // TODO : implémenter
         }
 

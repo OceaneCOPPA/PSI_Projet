@@ -257,7 +257,27 @@ namespace TourneeFutee
         public void SetEdgeWeight(string sourceName, string destinationName, float weight)
         {
             // TODO : implémenter
-            
+            if (!vertexIndex.ContainsKey(sourceName))
+            {
+                throw new ArgumentException("Erreur : sommet destination non trouvé");
+            }
+
+            if (!vertexIndex.ContainsKey(destinationName))
+            {
+                throw new ArgumentException("Erreur : sommet destination non trouvé");
+            }
+
+            int sourceIndex = vertexIndex[sourceName];
+            int destinationIndex = vertexIndex[destinationName];
+
+            matrix.SetValue(sourceIndex, destinationIndex, weight); 
+
+            if (!directed)
+            {
+                matrix.SetValue(destinationIndex, sourceIndex, weight);
+            }
+
+
 
         }
 

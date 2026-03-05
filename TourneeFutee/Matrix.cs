@@ -82,6 +82,15 @@
         public void AddColumn(int j)
         {
             // TODO : implémenter
+            if ( (j<0 ) || (j>nbColumns) )
+            {
+                throw new ArgumentOutOfRangeException("L'indice n'est pas dans les bornes");
+            }
+            for (int i = 0; i < nbRows; i++)
+            {
+                matrice[i].Insert(j, defaultValue);
+            }
+            this.nbColumns++;
         }
 
         // Supprime la ligne à l'indice `i`. Décale les lignes suivantes vers le haut.
@@ -89,6 +98,12 @@
         public void RemoveRow(int i)
         {
             // TODO : implémenter
+            if ((i < 0) || (i > nbRows - 1))
+            {
+                throw new ArgumentOutOfRangeException("L'indice n'est pas dans les bornes");
+            }
+            matrice.RemoveAt(i);
+            this.nbRows--;
         }
 
         // Supprime la colonne à l'indice `j`. Décale les colonnes suivantes vers la gauche.
@@ -96,6 +111,15 @@
         public void RemoveColumn(int j)
         {
             // TODO : implémenter
+            if ((j < 0) || (j > nbColumns - 1))
+            {
+                throw new ArgumentOutOfRangeException("L'indice n'est pas dans les bornes");
+            }
+            for (int i = 0; i < nbRows; i++)
+            {
+                matrice[i].RemoveAt(j);
+            }
+            this.nbColumns--;
         }
 
         // Renvoie la valeur à la ligne `i` et colonne `j`
@@ -103,7 +127,11 @@
         public float GetValue(int i, int j)
         {
             // TODO : implémenter
-            return 0.0f;
+            if ((j < 0) || (j > nbColumns - 1) || (i<0) || (i>nbRows - 1) )
+            {
+                throw new ArgumentOutOfRangeException("L'indice n'est pas dans les bornes");
+            }
+            return matrice[i][j];
         }
 
         // Affecte la valeur à la ligne `i` et colonne `j` à `v`
@@ -111,12 +139,26 @@
         public void SetValue(int i, int j, float v)
         {
             // TODO : implémenter
+            if ((j < 0) || (j > nbColumns - 1) || (i < 0) || (i > nbRows - 1))
+            {
+                throw new ArgumentOutOfRangeException("L'indice n'est pas dans les bornes");
+            }
+            matrice[i][j] = v;
         }
 
         // Affiche la matrice
         public void Print()
         {
             // TODO : implémenter
+            for (int i = 0; i < nbRows; i++)
+            {
+                for (int j = 0; j < nbColumns-1; j++)
+                {
+                    Console.Write(matrice[i][j] + " | ");
+                }
+                Console.Write(matrice[i][nbColumns-1]);
+                Console.WriteLine();
+            }
         }
 
 

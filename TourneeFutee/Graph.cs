@@ -61,8 +61,9 @@ namespace TourneeFutee
                 throw new ArgumentException("Erreur : sommet déjà existant");
             }
 
-            int index = vertexNames.Count; //noiuvel index = taille actuele de la liste
+            int index = vertexNames.Count; //nouvel index = taille actuele de la liste
             vertexIndex.Add(name, index); // ajout du couple nom index 
+            vertexNames.Add(name);
             vertexValues.Add(value); // ajout de la valeur associé a ce sommet
             matrix.AddRow(matrix.NbRows); //ajout dune nouvelel ligne à la fin de la matrice
             matrix.AddColumn(matrix.NbColumns); // ajout nvl colonne à la fin de la matrice 
@@ -199,6 +200,11 @@ namespace TourneeFutee
         {
             // TODO : implémenter
             if (!vertexIndex.ContainsKey(sourceName))
+            {
+                throw new ArgumentException("Erreur : sommet destination non trouvé");
+            }
+
+            if (!vertexIndex.ContainsKey(destinationName))
             {
                 throw new ArgumentException("Erreur : sommet destination non trouvé");
             }

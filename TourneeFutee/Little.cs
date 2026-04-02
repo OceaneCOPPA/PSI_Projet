@@ -5,11 +5,13 @@
     public class Little
     {
         // TODO : ajouter tous les attributs que vous jugerez pertinents 
+        Graph graph;
 
         // Instancie le planificateur en spécifiant le graphe modélisant un problème de voyageur de commerce
         public Little(Graph graph)
         {
             // TODO : implémenter
+            this.graph = graph;
         }
 
         // Trouve la tournée optimale dans le graphe `this.graph`
@@ -28,7 +30,57 @@
         public static float ReduceMatrix(Matrix m)
         {
             // TODO : implémenter
-            return 0.0f;
+            float valeurReduction = 0f;
+            for(int i =0; i<m.NbRows; i++)
+            {
+                float minRow = float.PositiveInfinity;
+                for(int j=0; j<m.NbColumns;j++)
+                {
+                    float val = m.GetValue(i, j);
+                    if(val < minRow)
+                    {
+                        minRow = val;  
+                    }
+                }
+
+                if(minRow > 0 && minRow!= float.PositiveInfinity)
+                {
+                    for(int j = 0; j<m.NbColumns; j++)
+                    {
+                        float val = m.GetValue(i, j);
+                        if(val!= float.PositiveInfinity)
+                        { 
+                            m.SetValue(i, j, val-minRow);
+                        }
+                    }
+                    valeurReduction += minRow;
+                }
+            }
+            for (int j = 0; j<m.NbColumns; j++)
+            {
+                float minColumn = float.PositiveInfinity;
+                for (int i =0; i<m.NbRows;i++)
+                {
+                    float val = m.GetValue(i, j);
+                    if(val<minColumn)
+                    {
+                        minColumn = val;
+                    }
+                }
+                if(minColumn > 0 && minColumn!= float.PositiveInfinity)
+                {
+                    for(int i=0; i<m.NbColumns;i++)
+                    {
+                        float val = m.GetValue(i, j);
+                        if(val!= float.PositiveInfinity)
+                        {
+                            m.SetValue(i,j,val-minColumn);
+                        }
+                    }
+                    valeurReduction += minColumn;
+                }
+            }
+            return valeurReduction;
         }
 
         // Renvoie le regret de valeur maximale dans la matrice de coûts `m` sous la forme d'un tuple `(int i, int j, float value)`

@@ -88,7 +88,51 @@
         public static (int i, int j, float value) GetMaxRegret(Matrix m)
         {
             // TODO : implémenter
-            return (0, 0, 0.0f);
+            int ligneRegret = -1;
+            int colRegret = -1;
+            
+            float maxRegret = -1f;
+            for(int i = 0; i<m.NbRows;i++)
+            {
+                for(int j = 0; j<m.NbColumns;j++)
+                {
+                    if(m.GetValue(i, j) ==0)
+                    {
+                        float ligneMin = float.PositiveInfinity;
+                        for(int col = 0; col<m.NbColumns;col++)
+                        {
+                            if(col != j)
+                            {
+                                float val = m.GetValue(i, col);
+                                if(val<ligneMin)
+                                {
+                                    ligneMin = val;
+                                }
+                            }
+                        }
+                        float colMin = float.PositiveInfinity;
+                        for (int row = 0; row<m.NbRows;row++)
+                        {
+                            if(row!=i)
+                            {
+                                float val = m.GetValue(row, j);
+                                if(val<colMin)
+                                {
+                                    colMin = val;
+                                }
+                            }
+                        }
+                        float regret = ligneMin + colMin;
+                        if(regret > maxRegret)
+                        {
+                            maxRegret = regret;
+                            ligneRegret = i;
+                            colRegret = j;
+                        }
+                    }
+                }
+            }
+            return (ligneRegret, colRegret, maxRegret);
 
         }
 

@@ -7,29 +7,47 @@
 
         // propriétés
 
+        private List<(string source, string destination)> segments;
+        private float cost;
+
+        public Tour()
+        {
+            segments = new List<(string source, string destination)>();
+            cost = 0f;
+        }
+
         // Coût total de la tournée
         public float Cost
         {
-            get;    // TODO : implémenter
+            get { return cost; }
+            set { cost = value; }
+            // TODO : implémenter
         }
 
         // Nombre de trajets dans la tournée
         public int NbSegments
         {
-            get;    // TODO : implémenter
+            get { return segments.Count; }    // TODO : implémenter
         }
 
 
         // Renvoie vrai si la tournée contient le trajet `source`->`destination`
         public bool ContainsSegment((string source, string destination) segment)
         {
-            return false;   // TODO : implémenter 
+            return segments.Contains(segment);   // TODO : implémenter 
         }
 
 
         // Affiche les informations sur la tournée : coût total et trajets
         public void Print()
         {
+            Console.WriteLine($"Coût total : {cost}");
+            Console.WriteLine("Trajets :");
+            foreach (var seg in segments)
+            {
+                Console.WriteLine($" {seg.source} - {seg.destination}");
+            }
+
             // TODO : implémenter 
         }
 

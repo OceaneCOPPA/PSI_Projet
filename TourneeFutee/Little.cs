@@ -141,8 +141,30 @@
          */
         public static bool IsForbiddenSegment((string source, string destination) segment, List<(string source, string destination)> includedSegments, int nbCities)
         {
+            var prochain = new Dictionary<string, string >();
+            foreach (var seg in includedSegments)
+            {
+                prochain[seg.source] = seg.destination;
+            }
 
-            // TODO : implémenter
+            string actuel = segment.destination;
+            int saut = 0;
+
+            while (prochain.ContainsKey(actuel) && saut < nbCities)
+            {
+                actuel = prochain[actuel];
+                saut++;
+
+                if (actuel == segment.source)
+                {
+                    if (saut == nbCities - 1)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            
             return false;   
         }
 

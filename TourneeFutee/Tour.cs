@@ -51,6 +51,11 @@
             // TODO : implémenter 
         }
 
+        public void AddSegment((string source, string destination) segment)
+        {
+            segments.Add(segment);
+        }
+
         // TODO : ajouter toutes les méthodes que vous jugerez pertinentes 
 
     }

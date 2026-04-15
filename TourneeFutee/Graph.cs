@@ -293,6 +293,11 @@ namespace TourneeFutee
         }
         // TODO : ajouter toutes les méthodes que vous jugerez pertinentes 
 
+        public bool ContainsVertex(string name)
+        {
+            return false;
+        }
+
     }
 
 

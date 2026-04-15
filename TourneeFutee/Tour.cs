@@ -15,6 +15,9 @@
             segments = new List<(string source, string destination)>();
             cost = 0f;
         }
+        public Tour(List<string> sequence, float cost)
+        {
+        }
 
         // Coût total de la tournée
         public float Cost
@@ -57,6 +60,11 @@
         }
 
         // TODO : ajouter toutes les méthodes que vous jugerez pertinentes 
+
+        public List<string> Vertices
+        {
+            get { return new List<string>(); }
+        }
 
     }
 }

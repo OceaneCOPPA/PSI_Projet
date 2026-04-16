@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace TourneeFutee
@@ -79,8 +80,77 @@ namespace TourneeFutee
             //
             // Exemple pour récupérer l'id généré :
             //   uint id = Convert.ToUInt32(cmd.ExecuteScalar());
+            using (var conn = OpenConnection())
+            {
+                string insertGraphQuery = @"
+                INSERT INTO Graphe (nom, nb_sommets, est_oriente)
+                VALUES (@nom, @nbSommets,@estOriente);";
+                uint graphId;
+                using (var cmd = new MySqlCommand(insertGraphQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nom", "Graphe");
+                    cmd.Parameters.AddWithValue("@nbSommets", g.Order);
+                    cmd.Parameters.AddWithValue("@estOriente", g.Directed);
+                    cmd.ExecuteNonQuery();
+                    graphId = Convert.ToUInt32(cmd.LastInsertedId);
+                }
 
-            throw new NotImplementedException("SaveGraph non implémenté.");
+                Dictionary<string, uint> vertexDbIds = new Dictionary<string, uint>();
+                List<string> vertexNames = g.GetVertexNames();
+
+                string insertVertexQuery = @"
+                    INSERT INTO Sommet (graphe_id, nom, valeur, indice)
+                    VALUES (@grapheId, @nom,@valeur,@indice);";
+
+                for (int i = 0; i < vertexNames.Count; i++)
+                {
+                    string vertexName = vertexNames[i];
+                    float vertexValues = g.GetVertexValue(vertexName);
+                    using (var cmd = new MySqlCommand(insertVertexQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@graphId", graphId);
+                        cmd.Parameters.AddWithValue("@nom", vertexName);
+                        cmd.Parameters.AddWithValue("@valeur", vertexValues);
+                        cmd.Parameters.AddWithValue("@indice", i);
+                        cmd.ExecuteNonQuery();
+                        uint vertexId = Convert.ToUInt32(cmd.LastInsertedId);
+                        vertexDbIds[vertexName] = vertexId;
+                    }
+
+                }
+
+                string insertEdgeQuery = @"
+                INSERT INTO Arc (graphe_id, sommet_source,sommet_dest,poids)
+                VALUES (@grapheId, @sourceId, @destId,@poids);";
+
+                for (int i = 0; i < vertexNames.Count; i++)
+                {
+                    int jStart = g.Directed ? 0 : i + 1;
+                    for (int j = jStart; j < vertexNames.Count; j++)
+                    {
+                        if (i == j)
+                        {
+                            continue;
+                        }
+                        float value = g.GetMatrixValue(i, j);
+                        if (value != g.GetNoEdgeValue())
+                        {
+                            string sourceName = vertexNames[i];
+                            string destName = vertexNames[j];
+                            using (var cmd = new MySqlCommand(insertEdgeQuery, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@graphId", graphId);
+                                cmd.Parameters.AddWithValue("@sourceId", vertexDbIds[sourceName]);
+                                cmd.Parameters.AddWithValue("@destId", vertexDbIds[destName]);
+                                cmd.Parameters.AddWithValue("@poids", value);
+                                cmd.ExecuteNonQuery();
+
+                            }
+                        }
+                    }
+                }
+                return graphId;
+            }
         }
 
         /// <summary>

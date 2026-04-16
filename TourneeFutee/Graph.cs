@@ -311,7 +311,7 @@ namespace TourneeFutee
         }
 
         public float GetMatrixValue(int i, int j)
-            { return matrix.GetValue(i, j);
+        { return matrix.GetValue(i, j); }
     }
 
 

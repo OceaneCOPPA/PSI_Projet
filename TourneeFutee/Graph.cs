@@ -295,9 +295,23 @@ namespace TourneeFutee
 
         public bool ContainsVertex(string name)
         {
-            return false;
+            return vertexIndex.ContainsKey(name);
         }
 
+        public float GetNoEdgeValue()
+            { return noEdgeValue; }
+
+        public int GetVertexIndex(string name)
+        {
+            if(!vertexIndex.ContainsKey(name))
+            {
+                throw new ArgumentException("Erreur : sommet non trouvé");
+            }
+            return vertexIndex[name];
+        }
+
+        public float GetMatrixValue(int i, int j)
+            { return matrix.GetValue(i, j);
     }
 
 

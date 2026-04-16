@@ -42,6 +42,17 @@ namespace TourneeFutee
 
             // TODO : tester la connexion dès la construction
             //        (ouvrir puis fermer une connexion pour valider les paramètres)
+            try
+            {
+                using (var conn = new MySqlConnection(_connectionString))
+                {
+                    conn.Open();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erreur lors de la connexion à la base de données" + ex.Message, ex);
+            }
             throw new NotImplementedException("Constructeur non implémenté.");
         }
 

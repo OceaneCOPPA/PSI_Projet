@@ -17,6 +17,13 @@
         }
         public Tour(List<string> sequence, float cost)
         {
+            this.cost = cost;
+            segments = new List<(string source, string destination)>();
+            
+            for (int i = 0; i < sequence.Count - 1; i++)
+            {
+                segments.Add((sequence[i], sequence[i + 1]));
+            }
         }
 
         // Coût total de la tournée
@@ -63,7 +70,21 @@
 
         public List<string> Vertices
         {
-            get { return new List<string>(); }
+            get 
+            {
+                if (segments.Count == 0)
+                {
+                    return new List<string>();
+                }
+                
+                var resultat = new List<string>();
+                resultat.Add(segments[0].source);
+                foreach (var seg in segments)
+                {
+                    resultat.Add(seg.destination);
+                }
+                return resultat;          
+            }
         }
 
     }

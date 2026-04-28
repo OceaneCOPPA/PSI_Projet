@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using MySql.Data.MySqlClient;
 
 namespace TourneeFutee
@@ -255,16 +256,60 @@ namespace TourneeFutee
         /// <returns>Identifiant de la tournée en base de données (AUTO_INCREMENT).</returns>
         public uint SaveTour(uint graphId, Tour t)
         {
-            // TODO : implémenter la sauvegarde de la tournée
-            //
-            // Ordre recommandé :
-            //   1. INSERT dans Tournee (cout_total, graphe_id) -> récupérer l'id
-            //   2. Pour chaque sommet de la séquence (avec son numéro d'ordre) :
-            //      INSERT dans EtapeTournee (tournee_id, numero_ordre, sommet_id)
-            //
-            // Attention : conserver l'ordre des étapes est essentiel pour
-            //             pouvoir reconstruire la tournée fidèlement au chargement.
+            using (var conn = OpenConnection())
+            {
+                uint tourId;
+                string insertTourQuery = @"
+                    INSERT INTO Tournee (graphe_id, cout_total)
+                    VALUES (@grapheId, @coutTotal);";
 
+                using (var cmd = new MySqlCommand(insertTourQuery,conn))
+                {
+                    cmd.Parameters.AddWithValue("@grapheId", graphId);
+                    cmd.Parameters.AddWithValue("@coutTotal", t.Cost);
+                    cmd.ExecuteNonQuery();
+                    tourId = Convert.ToUInt32(cmd.LastInsertedId);
+                }
+
+                List<string> vertices = t.Vertices;
+
+                string findVertexQuery = @"
+                    SELECT id FROM Sommet
+                    WHERE graphe_id = @grapheId AND nom = @nom
+                    LIMIT 1;";
+
+                string insertEtapeQuery = @"
+                    INSERT INTO EtapeTournee (tournee_id, numero_ordre, sommet_id)
+                    VALUES (@tourneeId, @numeroOrdre, @sommetId);";
+
+                for (int i = 0; i < vertices.Count; i++)
+                {
+                    uint sommetId;
+                    using (var cmd = new MySqlCommand(findVertexQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@grapheId", graphId);
+                        cmd.Parameters.AddWithValue("@nom", vertices[i]);
+                        object result = cmd.ExecuteScalar();
+                        if (result == null)
+                        {
+                            throw new Exception($"Sommet '{vertices[i]}' introuvable en BDD pour le graphe {graphId}.");
+                        }
+                        sommetId = Convert.ToUInt32(result);
+                    }
+
+                    using (var cmd = new MySqlCommand(insertEtapeQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@tourneeId", tourId);
+                        cmd.Parameters.AddWithValue("@numeroOrdre", i + 1);
+                        cmd.Parameters.AddWithValue("@sommetId", sommetId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return tourId;
+
+            }
+           
             throw new NotImplementedException("SaveTour non implémenté.");
         }
 
@@ -276,14 +321,51 @@ namespace TourneeFutee
         /// <returns>Instance de <see cref="Tour"/> reconstituée.</returns>
         public Tour LoadTour(uint id)
         {
-            // TODO : implémenter le chargement de la tournée
-            //
-            // Ordre recommandé :
-            //   1. SELECT dans Tournee WHERE id = @id -> récupérer cout_total et graphe_id
-            //   2. SELECT dans EtapeTournee JOIN Sommet WHERE tournee_id = @id
-            //      ORDER BY numero_ordre -> reconstruire la séquence ordonnée de sommets
-            //   3. Construire et retourner l'instance Tour
+            using (var conn = OpenConnection())
+            {
+                float coutTotal;
+                string selectTourQuery = @"
+                    SELECT cout_total FROM Tournee WHERE id = @id;";
 
+                using (var cmd = new MySqlCommand(selectTourQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    object result = cmd.ExecuteScalar();
+                    if (result == null)
+                    {
+                        throw new ArgumentException($"Aucune tournée trouvée avec l'id {id}.");
+                    }
+                    coutTotal = Convert.ToSingle(result);
+                }
+
+                var sequence = new List<string>();
+                string selectEtapesQuery = @"
+                    SELECT s.nom
+                    FROM EtapeTournee e
+                    JOIN Sommet s ON e.sommet_id = s.id
+                    WHERE e.tournee_id = @id
+                    ORDER BY e.numero_ordre ASC;";
+
+                using (var cmd = new MySqlCommand( selectEtapesQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            sequence.Add(reader.GetString("nom"));
+                        }
+                    }
+                }
+
+                return new Tour(sequence, coutTotal);
+            }
+            
+            
+            
+            
+            
+            
             throw new NotImplementedException("LoadTour non implémenté.");
         }
 
